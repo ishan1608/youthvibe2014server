@@ -7,6 +7,6 @@
     "node": "0.10.x"
   },
   "dependencies": {
-    "node-static": "~1.2.15"
+    "node-static": "~0.7.4"
   }
 }
