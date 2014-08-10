@@ -1,0 +1,12 @@
+{
+  "name": "YouthVibe2014Server",
+  "version": "0.0.0",
+  "description": "YouthVibe 2014 files server.",
+  "main": "app.js",
+  "engines": {
+    "node": "0.10.x"
+  },
+  "dependencies": {
+    "node-static": "~1.2.15"
+  }
+}
