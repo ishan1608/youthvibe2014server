@@ -49,9 +49,9 @@ http.createServer(function (req, res) {
                 res.write('\n\nRaw Form Data : \n' + formData);
                 console.log(fields);
                 
-                // '\nHave to process the fields and fire up gcm.';
-                
-                // Start of my GCM experiment            
+                // TODO: Have to remove the GCM firing from here and instead store the registration IDs in the mongoDB database.
+                // Will have to shift the GCM Experiment to a new location '/register'
+                // Start of my GCM experiment
                 var data = {
                     "collapseKey": "applice",
                     "delayWhileIdle": true,
@@ -62,6 +62,7 @@ http.createServer(function (req, res) {
                         "username": fields.username,
                         "password": fields.password
                     },
+                    // TODO: Will fetch these registration IDs from the database.
                     "registration_ids":[fields.RegistrationID]
                     };
                 
@@ -128,9 +129,6 @@ http.createServer(function (req, res) {
                         console.log(body);
                     }
                 });*/
-            
-                // Have to wait for the GCM to end and thus have to end the connection from there itself
-                // res.end();
             });
         }
     }
