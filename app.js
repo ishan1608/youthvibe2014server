@@ -7,7 +7,7 @@ var util = require('util');
 var request = require('request');
 
 var staticServer = new(nodeStatic.Server)();
-var port = Number(process.env.PORT || 8080);
+var port = Number(process.env.PORT || 80);
 
 http.createServer(function (req, res) {
     // Testing for public folder for static hosting
