@@ -1,11 +1,12 @@
-var static = require('node-static');
+var nodeStatic = require('node-static');
 var http = require('http');
 var url = require('url');
 var fs = require('fs');
 var formidable = require('formidable');
 var util = require('util');
+var request = require('request');
 
-var file = new(static.Server)();
+var staticServer = new(nodeStatic.Server)();
 var port = Number(process.env.PORT || 80);
 
 http.createServer(function (req, res) {
@@ -18,7 +19,7 @@ http.createServer(function (req, res) {
     // console.log(folder);
     if(folder == '/public/') {
         // console.log('Inside public folder for static hosting.');
-        file.serve(req, res);
+        staticServer.serve(req, res);
     } else {
         // res.end('not inside public folder for my implementation');
         // console.log(parts.path);
@@ -33,6 +34,8 @@ http.createServer(function (req, res) {
                 }
             });
         } else if(parts.path == '/send') {
+            /*
+            // start of my GCM Experiment
             // console.log('inside send :\n');
             // This only works for the get methods
             // console.log(url.parse(req.url, true).query);
@@ -45,8 +48,99 @@ http.createServer(function (req, res) {
                 res.write('Received form:\n\n');
                 res.write('Fields :\nusername : ' + fields.username + '\npassword : ' + fields.password);
                 console.log(fields);
-                res.end('\nHave to process the fields and fire up gcm.');
+                
+                // '\nHave to process the fields and fire up gcm.';
+                
+                // Start of my GCM experiment            
+                var data = {
+                    "collapseKey": "applice",
+                    "delayWhileIdle": true,
+                    "timeToLive": 3,
+                    "data":{
+                        "message": "My message",
+                        "title": "My Title",
+                        "username": fields.username,
+                        "password": fields.password
+                    },
+                    "registration_ids":["Sample_Registration_Id"]
+                    };
+                
+                    var dataString =  JSON.stringify(data);
+                    var headers = {
+                        'Authorization' : 'key=AIzaSyBlii4ipb-Xzdybvg1DhdNcZ8oaU9-JfIk',
+                        'Content-Type' : 'application/json',
+                        'Content-Length' : dataString.length
+                    };
+
+                    var options = {
+                        host: 'android.googleapis.com',
+                        // host: 'requestb.in',
+                        port: 80,
+                        path: '/gcm/send',
+                        // path: '/11qa0tm1',
+                        method: 'POST',
+                        headers: headers
+                    };
+
+                    //Setup the request 
+                    var req = http.request(options, function(res) {
+                        res.setEncoding('utf-8');
+
+                        var responseString = '';
+
+                        res.on('data', function(data) {
+                            // console.log('response data event');
+                            responseString += data;
+                        });
+
+                        res.on('end', function() {
+                            // console.log('response end event');
+                            // var resultObject = JSON.parse(responseString);
+                            // print(responseString);
+                            console.log(responseString);
+                            // console.log(resultObject);
+                        });
+                        console.log('STATUS: ' + res.statusCode);
+                        console.log('HEADERS: ' + JSON.stringify(res.headers));
+                    });
+
+                    req.on('error', function(e) {
+                        // TODO: handle error.
+                        console.log('error : ' + e.message + e.code);
+                    });
+
+                    req.write(dataString);
+                    req.end();
+
+                // End of my GCM Experiment
+                
+                
+                // requestb.in experiment
+                // var request = require('request');
+                var binurl ='http://requestb.in/11qa0tm1';
+                console.log('trying to send a request to : ' + binurl);
+                    request(binurl, function (error, response, body) {
+                    if (!error) {
+                        console.log(body);
+                    }
+                });
+            
+                res.end();
             });
+            */
+            
+            // Start of my android experiment
+            var form = new formidable.IncomingForm();
+            form.parse(req, function(err, fields, files) {
+                res.writeHead(200, {'content-type': 'text/plain'});
+                res.write('Received form:\n\n');
+                res.write('Fields :\nusername : ' + fields.username + '\npassword : ' + fields.password);
+                var rawData = util.inspect({fields: fields, files: files});
+                res.write('\n\nRaw Data : \n' + rawData);
+                res.end();
+            });
+            
+            // End of my android experiment
         }
     }
 }).listen(port);
