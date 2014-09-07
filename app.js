@@ -7,7 +7,7 @@ var util = require('util');
 var request = require('request');
 
 var staticServer = new(nodeStatic.Server)();
-var port = Number(process.env.PORT || 80);
+var port = Number(process.env.PORT || 8080);
 
 http.createServer(function (req, res) {
     // Testing for public folder for static hosting
@@ -42,10 +42,11 @@ http.createServer(function (req, res) {
             var form = new formidable.IncomingForm();
 
             form.parse(req, function(err, fields, files) {
-                var data = util.inspect({fields: fields, files: files});
+                var formData = util.inspect({fields: fields, files: files});
                 res.writeHead(200, {'content-type': 'text/plain'});
                 res.write('Received form:\n\n');
                 res.write('Fields :\nusername : ' + fields.username + '\npassword : ' + fields.password);
+                res.write('\n\nRaw Form Data : \n' + formData);
                 console.log(fields);
                 
                 // '\nHave to process the fields and fire up gcm.';
@@ -100,7 +101,7 @@ http.createServer(function (req, res) {
                             // console.log(resultObject);
                             
                             // Since we are writing to reponse from here. We have to end the response from here too
-                            res.write('\n\n' + util.inspect({response : responseString}));
+                            res.write('\n\nGCM Data : \n' + util.inspect({response : responseString}));
                             res.end();
                         });
                         console.log('STATUS: ' + GCMres.statusCode);
