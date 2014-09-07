@@ -62,7 +62,7 @@ http.createServer(function (req, res) {
                         "username": fields.username,
                         "password": fields.password
                     },
-                    "registration_ids":["Sample_Registration_Id"]
+                    "registration_ids":[fields.RegistrationID]
                     };
                 
                     var dataString =  JSON.stringify(data);
