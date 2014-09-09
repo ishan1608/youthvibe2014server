@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "formidable": "~1.0.15",
+    "mongodb": "^1.4.10",
     "node-static": "~0.7.4",
     "request": "^2.42.0"
   }
