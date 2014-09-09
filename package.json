@@ -1,13 +1,14 @@
 {
-    "name": "YouthVibe2014Server",
-    "version": "0.0.0",
-    "description": "YouthVibe 2014 server.",
-    "main": "app.js",
-    "engines": {
-        "node": "0.10.x"
-    },
-    "dependencies": {
-        "node-static": "~0.7.4",
-        "formidable": "~1.0.15"
-    }
+  "name": "YouthVibe2014Server",
+  "version": "0.0.0",
+  "description": "YouthVibe 2014 server.",
+  "main": "app.js",
+  "engines": {
+    "node": "0.10.x"
+  },
+  "dependencies": {
+    "formidable": "~1.0.15",
+    "node-static": "~0.7.4",
+    "request": "^2.42.0"
+  }
 }
