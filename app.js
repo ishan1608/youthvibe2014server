@@ -175,10 +175,26 @@ http.createServer(function (req, res) {
                                 res.write('Error getting the user list');
                             } else {
                                 res.write('List of registered users :\n');
-                                var cursor = collection.find({'id': true, '_id': false});
+                                /*var cursor = collection.find({'id': true, '_id': false});
                                 for(int i=0; i<cursor.length(); i++) {
                                     res.write(cursor[i].id);
-                                }
+                                }*/
+                                
+                                
+                                collection.find().toArray(function(err, docs) {
+                                    if(!err){
+                                        db.close();
+                                        var intCount = docs.length;
+                                        if(intCount > 0){
+                                            for(var i=0; i<intCount;){
+                                                res.write("testing loop execution\n");
+                                                i=i+1;
+                                            }
+                                        }
+                                    }
+
+                                
+                                
                             }
                         });
                     }
