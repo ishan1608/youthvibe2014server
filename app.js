@@ -8,10 +8,12 @@ var request = require('request');
 var mongo = require('mongodb');
 
 var staticServer = new(nodeStatic.Server)();
-var port = Number(process.env.PORT || 8080);
 
+var port = Number(process.env.PORT || 8080);
 // MongoHQ Server Url 'mongodb://ishanatmuz:m7382in@kahana.mongohq.com:10045/youthVibe2014';
 var mongoUri = process.env.MONGOHQ_URL || 'mongodb://127.0.0.1:27017/youthVibe2014';
+var registrationKeys = [];
+var message = 'Default Message', title = 'Default Title', senderId = 'Default ID';
 
 http.createServer(function (req, res) {
     // Testing for public folder for static hosting
@@ -51,91 +53,128 @@ http.createServer(function (req, res) {
                 form.parse(req, function(err, fields, files) {
                     var formData = util.inspect({fields: fields, files: files});
                     res.writeHead(200, {'content-type': 'text/plain'});
-                    res.write('Received form:\n\n');
-                    res.write('Fields :\nusername : ' + fields.username + '\npassword : ' + fields.password);
-                    res.write('\n\nRaw Form Data : \n' + formData);
-                    console.log(fields);
+                    
+                    // TODO: Authorization testing based on userid and password
+                    
+                    // res.write('Received form:\n\n');
+                    // res.write('Fields :\nusername : ' + fields.username + '\npassword : ' + fields.password);
+                    // res.write('\n\nRaw Form Data : \n' + formData);
+                    // console.log(fields);
+                    if(fields.username === 'ishanatmuz' && fields.password === 'm7382in') {
+                        senderId = fields.username;
+                        title = fields.title;
+                        message = fields.message;
+                        
+                        // MongoDB database connection here
+                        var MongoClient = mongo.MongoClient;
 
-                    // TODO: Have to remove the GCM firing from here and instead store the registration IDs in the mongoDB database.
-                    // Will have to shift the GCM Experiment to a new location '/send'
-                    // Start of my GCM experiment
-                    var data = {
-                        "collapseKey": "applice",
-                        "delayWhileIdle": true,
-                        "timeToLive": 3,
-                        "data":{
-                            "message": "My message",
-                            "title": "My Title",
-                            "username": fields.username,
-                            "password": fields.password
-                        },
-                        // TODO: Will fetch these registration IDs from the database.
-                        "registration_ids":[fields.RegistrationID]
-                        };
+                        // Connect to the db
+                        MongoClient.connect(mongoUri, function(err, db) {
+                          if(!err) {
+                              console.log("Connected to database");
+                              var collection = db.collection('userIds');
+                              collection.find().toArray(function(err, items) {
+                                  if(!err) {
+                                      // res.write('List of users :\n\n');
+                                      for(var i=0; i<items.length; i++) {
+                                          // Creating an array of registration Ids
+                                          registrationKeys[i] = items[i].id;
+                                      }
+                                      // Have to pass the title, message
+                                      fireGCM();
+                                      // res.end('\nThe database is hosted on ' + mongoUri);
+                                      // db.close();
+                                  } else {
+                                      console.log('Error retreiving the data');
+                                      res.end('Error retreiving the data');
+                                  }
+                              });
+                              // Storing the sent Messages in the database the title, message and sender's id
+                              var collection = db.collection('notifications');
+                              collection.insert({'title': title, 'message': message, 'sender': senderId }, {safe: true}, function(err, rs) {
+                                  if(!err) {
+                                      // res.write("\nMessage stored successfully :\n" + rs);
+                                      res.write('\n\tMessage sent successfully :\n\n\tTitle : ' + title + '\n\tMessage : ' + message + '\n\tSender : ' + senderId);
+                                  } else {
+                                      res.write('Error in updating the message in database. No History maintained.');
+                                  }
+                              });
 
-                        var dataString =  JSON.stringify(data);
-                        var headers = {
-                            'Authorization' : 'key=AIzaSyBlii4ipb-Xzdybvg1DhdNcZ8oaU9-JfIk',
-                            'Content-Type' : 'application/json',
-                            'Content-Length' : dataString.length
-                        };
-
-                        var options = {
-                            host: 'android.googleapis.com',
-                            // host: 'requestb.in',
-                            port: 80,
-                            path: '/gcm/send',
-                            // path: '/11qa0tm1',
-                            method: 'POST',
-                            headers: headers
-                        };
-
-                        //Setup the request 
-                        var GCMreq = http.request(options, function(GCMres) {
-                            GCMres.setEncoding('utf-8');
-
-                            var responseString = '';
-
-                            GCMres.on('data', function(data) {
-                                // console.log('response data event');
-                                responseString += data;
-                            });
-
-                            GCMres.on('end', function() {
-                                // console.log('response end event');
-                                // var resultObject = JSON.parse(responseString);
-                                // print(responseString);
-                                console.log(util.inspect({response : responseString}));
-                                // console.log(resultObject);
-
-                                // Since we are writing to reponse from here. We have to end the response from here too
-                                res.write('\n\nGCM Data : \n' + util.inspect({response : responseString}));
-                                res.end();
-                            });
-                            console.log('STATUS: ' + GCMres.statusCode);
-                            console.log('HEADERS: ' + JSON.stringify(GCMres.headers));
+                          } else {
+                              console.log('Error connecting to database');
+                              res.end('Error connecting to database\nPlease contact the adiministrators.');
+                          }
                         });
 
-                        GCMreq.on('error', function(e) {
-                            // TODO: handle error.
-                            console.log('error : ' + e.message + e.code);
-                        });
+                        var fireGCM = function() {
+                            // Start of my GCM experiment
+                            var data = {
+                                "collapseKey": "applice",
+                                "delayWhileIdle": true,
+                                "timeToLive": 3,
+                                "data":{
+                                    "message": message,
+                                    "title": title
+                                },
+                                "registration_ids": registrationKeys
+                                };
 
-                        GCMreq.write(dataString);
-                        GCMreq.end();
+                                var dataString =  JSON.stringify(data);
+                                var headers = {
+                                    'Authorization' : 'key=AIzaSyBlii4ipb-Xzdybvg1DhdNcZ8oaU9-JfIk',
+                                    'Content-Type' : 'application/json',
+                                    'Content-Length' : dataString.length
+                                };
 
-                    // End of my GCM Experiment
+                                var options = {
+                                    host: 'android.googleapis.com',
+                                    // host: 'requestb.in',
+                                    port: 80,
+                                    path: '/gcm/send',
+                                    // path: '/11qa0tm1',
+                                    method: 'POST',
+                                    headers: headers
+                                };
 
+                                //Setup the request 
+                                var GCMreq = http.request(options, function(GCMres) {
+                                    GCMres.setEncoding('utf-8');
 
-                    /*// requestb.in experiment
-                    // var request = require('request');
-                    var binurl ='http://requestb.in/11qa0tm1';
-                    console.log('trying to send a request to : ' + binurl);
-                        request(binurl, function (error, response, body) {
-                        if (!error) {
-                            console.log(body);
+                                    var responseString = '';
+
+                                    GCMres.on('data', function(data) {
+                                        // console.log('response data event');
+                                        responseString += data;
+                                    });
+
+                                    GCMres.on('end', function() {
+                                        // console.log('response end event');
+                                        // var resultObject = JSON.parse(responseString);
+                                        // print(responseString);
+                                        console.log(util.inspect({response : responseString}));
+                                        // console.log(resultObject);
+
+                                        // Since we are writing to reponse from here. We have to end the response from here too
+                                        // res.write('\n\nGCM Data : \n' + util.inspect({response : responseString}));
+                                        res.end();
+                                    });
+                                    console.log('STATUS: ' + GCMres.statusCode);
+                                    console.log('HEADERS: ' + JSON.stringify(GCMres.headers));
+                                });
+
+                                GCMreq.on('error', function(e) {
+                                    // TODO: handle error.
+                                    console.log('error : ' + e.message + e.code);
+                                });
+
+                                GCMreq.write(dataString);
+                                GCMreq.end();
+
+                            // End of my GCM Experiment
                         }
-                    });*/
+                    } else {
+                        res.end('\n\n\t\tYou are not authorized to send notifications.\nIf you think this is a mistake, or you want to request for permission; please contact the administrators.');
+                    }
                 });
             break;
             case '/register':
@@ -180,6 +219,7 @@ http.createServer(function (req, res) {
                                   res.write('\n ' + i + ' : ' + items[i].id);
                               }
                               res.end('\nThe database is hosted on ' + mongoUri);
+                              db.close();
                           } else {
                               console.log('Error retreiving the data');
                               res.end('Error retreiving the data');
