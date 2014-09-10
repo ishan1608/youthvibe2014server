@@ -163,43 +163,34 @@ http.createServer(function (req, res) {
             case '/users':
                 res.writeHead(200, {'content-type': 'text/plain'});
                 // MongoDB server connection to store IDs
-                res.write('attempting connection\n');
-                mongo.Db.connect(mongoUri, function (err, db) {
-                    if(err) {
-                        res.write('Error connecting to the database.');
-                    } else {
-                        res.write('attempting to get collection\n');
-                        db.collection('userIds', function(err, collection) {
-                            res.write('inside the collection error or collection area\n');
-                            if(err) {
-                                res.write('Error getting the user list');
-                            } else {
-                                res.write('List of registered users :\n');
-                                /*var cursor = collection.find({'id': true, '_id': false});
-                                for(int i=0; i<cursor.length(); i++) {
-                                    res.write(cursor[i].id);
-                                }*/
-                                
-                                
-                                collection.find().toArray(function(err, docs) {
-                                    if(!err){
-                                        db.close();
-                                        var intCount = docs.length;
-                                        if(intCount > 0){
-                                            for(var i=0; i<intCount;){
-                                                res.write("testing loop execution\n");
-                                                i=i+1;
-                                            }
-                                        }
-                                    }
+                // res.write('attempting connection\n');
+                
+                // Retrieve
+                var MongoClient = mongo.MongoClient;
 
-                                
-                                
-                            }
-                        });
-                    }
-                  });
-                res.end('\n\n\t\tReached the end');
+                // Connect to the db
+                MongoClient.connect(mongoUri, function(err, db) {
+                  if(!err) {
+                      console.log("Connected to database");
+                      var collection = db.collection('userIds');
+                      collection.find().toArray(function(err, items) {
+                          if(!err) {
+                              res.write('List of users :\n\n');
+                              for(var i=0; i<items.length; i++) {
+                                  res.write('\n ' + i + ' : ' + items[i].id);
+                              }
+                              res.end('\nThe database is hosted on ' + mongoUri);
+                          } else {
+                              console.log('Error retreiving the data');
+                              res.end('Error retreiving the data');
+                          }
+                      });
+                      
+                  } else {
+                      console.log('Error connecting to database');
+                      res.end('Error connecting to database\nPlease contact the adiministrators.');
+                  }
+                });
             break;
             default:
                 console.log("Sorry, we are out of " + parts.path + ".");
