@@ -163,18 +163,21 @@ http.createServer(function (req, res) {
             case '/users':
                 res.writeHead(200, {'content-type': 'text/plain'});
                 // MongoDB server connection to store IDs
+                res.write('attempting connection\n');
                 mongo.Db.connect(mongoUri, function (err, db) {
                     if(err) {
                         res.write('Error connecting to the database.');
                     } else {
+                        res.write('attempting to get collection\n');
                         db.collection('userIds', function(err, collection) {
+                            res.write('inside the collection error or collection area\n');
                             if(err) {
                                 res.write('Error getting the user list');
                             } else {
                                 res.write('List of registered users :\n');
                                 var cursor = collection.find({'id': true, '_id': false});
-                                for(key in cursor) {
-                                    res.write('id : ' + key + '\n');
+                                for(int i=0; i<cursor.length(); i++) {
+                                    res.write(cursor[i].id);
                                 }
                             }
                         });
