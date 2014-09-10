@@ -173,14 +173,14 @@ http.createServer(function (req, res) {
                             } else {
                                 res.write('List of registered users :\n');
                                 var cursor = collection.find({'id': true, '_id': false});
-                                cursor.each(function(number, element) {
-                                    res.write(number + ' : ' + element + '\n');
-                                });
+                                for(key in cursor) {
+                                    res.write('id : ' + key + '\n');
+                                }
                             }
                         });
                     }
                   });
-                res.end();
+                res.end('\n\n\t\tReached the end');
             break;
             default:
                 console.log("Sorry, we are out of " + parts.path + ".");
