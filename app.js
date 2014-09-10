@@ -139,7 +139,6 @@ http.createServer(function (req, res) {
                 });
             break;
             case '/register':
-                // res.end('You opened the page for phone registration; which is meant to be accesed via the app or by the administrator.\nImplementation is remaining.');
                 var form = new formidable.IncomingForm();
                 form.parse(req, function(err, fields, files) {
                     res.writeHead(200, {'content-type': 'text/plain'});
@@ -162,7 +161,26 @@ http.createServer(function (req, res) {
                 });
             break;
             case '/users':
-                res.end('Template to display the list of current users');
+                res.writeHead(200, {'content-type': 'text/plain'});
+                // MongoDB server connection to store IDs
+                mongo.Db.connect(mongoUri, function (err, db) {
+                    if(err) {
+                        res.write('Error connecting to the database.');
+                    } else {
+                        db.collection('userIds', function(err, collection) {
+                            if(err) {
+                                res.write('Error getting the user list');
+                            } else {
+                                res.write('List of registered users :\n');
+                                var cursor = collection.find({'id': true, '_id': false});
+                                cursor.each(function(number, element) {
+                                    res.write(number + ' : ' + element + '\n');
+                                });
+                            }
+                        });
+                    }
+                  });
+                res.end();
             break;
             default:
                 console.log("Sorry, we are out of " + parts.path + ".");
