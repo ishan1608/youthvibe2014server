@@ -155,7 +155,7 @@ http.createServer(function (req, res) {
                                         // console.log(resultObject);
 
                                         // Since we are writing to reponse from here. We have to end the response from here too
-                                        // res.write('\n\nGCM Data : \n' + util.inspect({response : responseString}));
+                                        res.write('\n\nGCM Data : \n' + util.inspect({response : responseString}));
                                         res.end();
                                     });
                                     console.log('STATUS: ' + GCMres.statusCode);
