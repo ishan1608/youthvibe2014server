@@ -234,6 +234,8 @@ http.createServer(function (req, res) {
             break;
             default:
                 console.log("Sorry, we are out of " + parts.path + ".");
+                res.writeHead(404, {'content-type': 'text/plain'});
+                res.end("Sorry, we are out of " + parts.path + ".");
         }
     }
 }).listen(port);
