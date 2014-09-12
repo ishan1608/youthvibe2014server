@@ -187,7 +187,7 @@ http.createServer(function (req, res) {
                         // MongoDB server connection to store IDs
                         mongo.Db.connect(mongoUri, function (err, db) {
                             db.collection('userIds', function(err, collection) {
-                              collection.insert({'id': fields.RegistrationID}, {safe: true}, function(err, rs) {
+                              collection.insert({'id': fields.RegistrationID, 'facebookId': fields.FacebookID, 'name': fields.Name, 'email': fields.Email}, {safe: true}, function(err, rs) {
                                 if(err) {
                                   res.end("\nUser Registration Failed.\n" + err);
                                 } else if(rs) {
