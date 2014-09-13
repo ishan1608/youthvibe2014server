@@ -233,7 +233,6 @@ http.createServer(function (req, res) {
                 });
             break;
             // GCM tets cases
-            switch (parts.path) {
             case '/gcmform':
                 // Read the file and send it to the user
                 fs.readFile('gcmform.html', function(error, data) {
@@ -406,7 +405,6 @@ http.createServer(function (req, res) {
                 console.log("Sorry, we are out of " + parts.path + ".");
                 res.writeHead(404, {'content-type': 'text/plain'});
                 res.end("Sorry, we are out of " + parts.path + ".");
-            }
         }
     }
 }).listen(port);
