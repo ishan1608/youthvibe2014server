@@ -287,8 +287,8 @@ http.createServer(function (req, res) {
                                       // res.end('\nThe database is hosted on ' + mongoUri);
                                       // db.close();
                                   } else {
-                                      console.log('Error retreiving the data');
-                                      res.end('Error retreiving the data');
+                                      console.log('Error retreiving the gcmIds');
+                                      res.end('Error retreiving the gcmIds');
                                   }
                               });
                               // Storing the sent Messages in the database the title, message and sender's id
