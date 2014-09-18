@@ -216,7 +216,11 @@ http.createServer(function (req, res) {
                           if(!err) {
                               res.write('List of users :\n\n');
                               for(var i=0; i<items.length; i++) {
-                                  res.write('\n ' + i + ' : ' + items[i].id);
+                                  res.write('\n ' + i + ' :');
+                                  res.write('\n     Name        : ' + items[i].Name);
+                                  res.write('\n     Email       : ' + items[i].Email);
+                                  res.write('\n     GCM ID      : ' + items[i].id);
+                                  res.write('\n     Facebook ID : ' + items[i].FacebookID);
                               }
                               res.end('\nThe database is hosted on ' + mongoUri);
                               db.close();
