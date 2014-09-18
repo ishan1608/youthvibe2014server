@@ -217,10 +217,10 @@ http.createServer(function (req, res) {
                               res.write('List of users :\n\n');
                               for(var i=0; i<items.length; i++) {
                                   res.write('\n ' + i + ' :');
-                                  res.write('\n     Name        : ' + items[i].Name);
-                                  res.write('\n     Email       : ' + items[i].Email);
+                                  res.write('\n     Name        : ' + items[i].name);
+                                  res.write('\n     Email       : ' + items[i].email);
                                   res.write('\n     GCM ID      : ' + items[i].id);
-                                  res.write('\n     Facebook ID : ' + items[i].FacebookID);
+                                  res.write('\n     Facebook ID : ' + items[i].facebookID);
                               }
                               res.end('\nThe database is hosted on https://www.compose.io');
                               db.close();
