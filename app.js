@@ -222,7 +222,7 @@ http.createServer(function (req, res) {
                                   res.write('\n     GCM ID      : ' + items[i].id);
                                   res.write('\n     Facebook ID : ' + items[i].FacebookID);
                               }
-                              res.end('\nThe database is hosted on ' + mongoUri);
+                              res.end('\nThe database is hosted on https://www.compose.io');
                               db.close();
                           } else {
                               console.log('Error retreiving the data');
