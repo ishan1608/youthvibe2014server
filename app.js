@@ -220,7 +220,7 @@ http.createServer(function (req, res) {
                                   res.write('\n     Name        : ' + items[i].name);
                                   res.write('\n     Email       : ' + items[i].email);
                                   res.write('\n     GCM ID      : ' + items[i].id);
-                                  res.write('\n     Facebook ID : ' + items[i].facebookID);
+                                  res.write('\n     Facebook ID : ' + items[i].facebookId);
                               }
                               res.end('\nThe database is hosted on https://www.compose.io');
                               db.close();
